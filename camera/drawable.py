@@ -4,6 +4,10 @@ from vector import vec, pyVec, rectAdd
 from spriteManager import SpriteManager
 
 class Drawable(object):
+
+
+    CAMERA_OFFSET = vec(0,0)
+
     def __init__(self, position=vec(0,0), fileName="", offset=None):
         self.fileName = fileName
         if fileName != "":
@@ -36,7 +40,7 @@ class Drawable(object):
         
     
     def draw(self, drawSurface):        
-        drawSurface.blit(self.image, pyVec(self.position))
+        drawSurface.blit(self.image, pyVec(self.position - Drawable.CAMERA_OFFSET))
          
     def getSize(self):
         return vec(*self.image.get_size())    

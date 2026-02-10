@@ -55,14 +55,17 @@ class GameEngine(object):
     def handleEvent(self, event):        
         if event.type == pygame.MOUSEBUTTONDOWN:
             position = vec(*event.pos) // SCALE
-            if self.kirby.getCollisionRect().collidepoint(position):
-                self.dragged = self.kirby
-                self.mouseOffset = self.kirby.getPosition() - position
+            position += Drawable.CAMERA_OFFSET
+
+            if self.rose.getCollisionRect().collidepoint(position):
+                self.dragged = self.rose
+                self.mouseOffset = self.rose.getPosition() - position
             #self.kirby.position = position
         elif event.type == pygame.MOUSEBUTTONUP:
             self.dragged = None
         elif event.type == pygame.MOUSEMOTION:
             position = vec(*event.pos) // SCALE
+            position += Drawable.CAMERA_OFFSET
             if self.dragged:
                 self.dragged.position = position + self.mouseOffset
 
@@ -101,15 +104,15 @@ class GameEngine(object):
             self.kirby.velocity[0] = 0
             self.kirby.position[0] = 0
         
-        elif self.kirby.getPosition()[0] + self.kirby.getWidth() > RESOLUTION[0]:
-            self.kirby.position[0] = RESOLUTION[0] - self.kirby.getWidth() 
+        elif self.kirby.getPosition()[0] + self.kirby.getWidth() > WORLD_SIZE[0]:
+            self.kirby.position[0] = WORLD_SIZE[0] - self.kirby.getWidth() 
             self.kirby.velocity[0]= 0
         
         if self.kirby.getPosition()[1] <= 0:
             self.kirby.velocity[1] = 0
             self.kirby.position[1] = 0
-        elif self.kirby.getPosition()[1] + self.kirby.getHeight() > RESOLUTION[1]:
-            self.kirby.position[1] = RESOLUTION[1] - self.kirby.getHeight()
+        elif self.kirby.getPosition()[1] + self.kirby.getHeight() > WORLD_SIZE[1]:
+            self.kirby.position[1] = WORLD_SIZE[1] - self.kirby.getHeight()
             self.kirby.velocity[1]= 0
 
 
@@ -140,3 +143,10 @@ class GameEngine(object):
                         #bottom push
                         
                         self.kirby.position[1] += collision.height
+
+
+        Drawable.CAMERA_OFFSET = self.kirby.getPosition() + self.kirby.getSize() /2 -  RESOLUTION //2 
+
+        for i in range(2):
+            Drawable.CAMERA_OFFSET[i] = max(min(Drawable.CAMERA_OFFSET[i], WORLD_SIZE[i] - RESOLUTION[i]), 
+                                            0)
